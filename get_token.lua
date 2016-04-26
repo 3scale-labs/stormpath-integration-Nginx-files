@@ -26,15 +26,15 @@ end
 
 function get_token(params)
   ngx.log(0,"Entering the get_token function")
-  local auth_code_required_params = {'username', 'password','app_id'}
+  local auth_code_required_params = {'username', 'password','client_id'}
   ngx.log(0,"Checking and setting  parameters...") 
   if ts.required_params_present(auth_code_required_params, params)  then
-  stormpath_username=params['username'];
-  stormpath_password=params['password'];
-  threescale_app_id=params['app_id'];
+  stormpath_username=params.username;
+  stormpath_password=params.password;
+  threescale_app_id=params.client_id;
     
-    ngx.log(0, "Calling oauth/token");
-    local res = ngx.location.capture("/_oauth/token", { method = ngx.HTTP_POST, body = "grant_type=password&username="..stormpath_username.."&password="..stormpath_password})
+    ngx.log(0, "Calling oauth/stormpath_gettoken");
+    local res = ngx.location.capture("/oauth/stormpath_gettoken", { method = ngx.HTTP_POST, body = "grant_type=password&username="..stormpath_username.."&password="..stormpath_password})
     
     if res.status ~= 200 then
       ngx.log(0, "Something went wrong when retrieving the token from Stormpath");
@@ -52,7 +52,7 @@ function get_token(params)
     end
 
   else
-    ngx.log(0,"This function requires 3 parameters: stormpath username, stormpath password and 3scale app_id")
+    ngx.log(0,"This function requires 3  parameters: stormpath username, stormpath password and 3scale client_id ")
     ngx.log(0, "There is an error in the parameters")
     ngx.exit(ngx.HTTP_FORBIDDEN)
   end
@@ -66,17 +66,21 @@ else
 end
 
 -- Check valid credentials first in backend
-
-local exists = ngx.location.capture("/_threescale/redirect_uri_matches", { vars= {app_id=params.app_id}})
+ngx.log(0,"Authenticating against 3scale")
+local exists = ngx.location.capture("/_threescale/auth", { args="app_id="..params.client_id.."&app_key="..params.client_secret, share_all_vars = true })
 
 if exists.status ~= 200 then
+  ngx.log(0,"3scale authentication failed")
   ngx.status = 403
   ngx.header.content_type = 'text/plain; charset=us-ascii'
-  ngx.print("Authentication failed")
+  ngx.print("3scale Authentication failed")
   ngx.exit(ngx.HTTP_OK)
 else
   -- Here we capture the username and passwords that the user entered in the form
   local s = get_token(params)
 end
+
+
+
 
 
