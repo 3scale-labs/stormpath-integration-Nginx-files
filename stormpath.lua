@@ -276,7 +276,8 @@ local params = {}
 local host = ngx.req.get_headers()["Host"]
 local auth_strat = ""
 local service = {}
-if ngx.var.service_id == '2555417729973' then
+-- CHANGE_ME: here you need to change the 3scale service_id to match your 3scale instance, so that the calls to the 3scale backend get authenticated
+if ngx.var.service_id == '<SERVICE-ID>' then
 local parameters = get_auth_params("headers", string.split(ngx.var.request, " ")[1] )
 service = service_2555417729973 --
 ngx.var.secret_token = Shared_secret_sent_from_proxy_to_API_backend_67665a6e4033f779
@@ -288,7 +289,8 @@ ngx.var.secret_token = Shared_secret_sent_from_proxy_to_API_backend_67665a6e4033
   get_credentials_access_token(params, service_2555417729973)
   ngx.var.cached_key = "2555417729973" .. ":" .. params.access_token
   auth_strat = "oauth"
-  ngx.var.service_id = "2555417729973"
+-- CHANGE_ME: here you need to change the 3scale service_id to match your 3scale instance, so that the calls to the 3scale backend get authenticated
+  ngx.var.service_id = "<SERVICE-ID>"
 -- CHANGE_ME: the name of the heroku app hosting the address book test application has to be changed here
   ngx.var.proxy_pass = "<FULL -INCLUDING HTTP- HEROKU APP URL>"
 
